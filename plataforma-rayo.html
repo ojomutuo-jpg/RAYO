@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plataforma Rayo — Documentación</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Spline+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --ink:#15130f;
+    --ink-soft:#4a463e;
+    --paper:#f4f0e8;
+    --paper-2:#ece6da;
+    --card:#fffdf8;
+    --rule:#d9d2c4;
+    --accent:#c9442b;
+    --accent-soft:#f2d9d1;
+    --mvp:#1f6b4a;
+    --mvp-soft:#d8ebe1;
+    --road:#9a6a14;
+    --road-soft:#f0e3c8;
+    --shadow:0 1px 2px rgba(20,16,8,.04),0 8px 24px rgba(20,16,8,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Spline Sans',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* layout */
+  .wrap{display:flex;min-height:100vh}
+  nav{
+    width:300px;flex-shrink:0;
+    background:var(--paper-2);
+    border-right:1px solid var(--rule);
+    padding:36px 26px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  nav .brand{font-family:'Fraunces',serif;font-weight:600;font-size:30px;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px}
+  nav .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);display:inline-block}
+  nav .tag{font-size:12.5px;color:var(--ink-soft);margin-top:4px;margin-bottom:28px;letter-spacing:.01em}
+  nav h4{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin:22px 0 9px;font-weight:600}
+  nav a{display:block;color:var(--ink-soft);text-decoration:none;font-size:13.5px;padding:5px 10px;border-radius:7px;transition:all .15s;margin-bottom:1px}
+  nav a:hover{background:var(--card);color:var(--ink)}
+  nav a.p1{border-left:2px solid transparent}
+  .navgroup-1 a:hover{color:var(--accent)}
+
+  main{flex:1;padding:64px 7vw 120px;max-width:920px}
+
+  /* hero */
+  .hero{margin-bottom:60px}
+  .hero .kicker{font-size:12.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);font-weight:600;margin-bottom:14px}
+  .hero h1{font-family:'Fraunces',serif;font-size:clamp(38px,6vw,62px);line-height:1.02;letter-spacing:-.025em;font-weight:600;margin-bottom:18px}
+  .hero p{font-size:17px;color:var(--ink-soft);max-width:620px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .meta span{font-size:12.5px;background:var(--card);border:1px solid var(--rule);padding:6px 13px;border-radius:100px;color:var(--ink-soft)}
+
+  /* platform divider */
+  .platform{margin:72px 0 8px;padding-top:30px;border-top:2px solid var(--ink)}
+  .platform .num{font-family:'Fraunces',serif;font-size:14px;color:var(--accent);font-weight:600;letter-spacing:.04em}
+  .platform h2{font-family:'Fraunces',serif;font-size:34px;letter-spacing:-.02em;font-weight:600;margin:6px 0 8px;line-height:1.08}
+  .platform .sub{font-size:15.5px;color:var(--ink-soft);max-width:560px}
+
+  /* module card */
+  .mod{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:14px;
+    padding:28px 30px;
+    margin-top:20px;
+    box-shadow:var(--shadow);
+  }
+  .mod-head{display:flex;align-items:baseline;gap:13px;margin-bottom:6px}
+  .mod-head .mn{font-family:'Fraunces',serif;font-size:13px;font-weight:600;color:#fff;background:var(--ink);min-width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-start;margin-top:2px}
+  .mod-head h3{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .mod .desc{color:var(--ink-soft);font-size:14.5px;margin:2px 0 0 43px;padding-bottom:4px}
+
+  .mod ul{list-style:none;margin:14px 0 0 43px}
+  .mod ul li{position:relative;padding-left:20px;margin-bottom:7px;font-size:14.5px;color:var(--ink)}
+  .mod ul li::before{content:"";position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .mod ul li strong{font-weight:600}
+
+  .sub-block{margin:16px 0 0 43px;padding:16px 18px;background:var(--paper);border-radius:10px;border:1px solid var(--rule)}
+  .sub-block h5{font-size:13.5px;font-weight:700;letter-spacing:.02em;margin-bottom:8px;text-transform:uppercase;color:var(--ink-soft)}
+  .sub-block ul{margin:0}
+  .sub-block ul li::before{background:var(--ink-soft)}
+
+  /* flow steps */
+  .flow{margin:18px 0 0 43px;counter-reset:step}
+  .flow .step{position:relative;padding-left:42px;margin-bottom:13px}
+  .flow .step::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-1px;width:27px;height:27px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif}
+  .flow .step b{font-weight:600}
+  .flow .step span{font-size:14.5px}
+
+  /* callout */
+  .note{margin:16px 0 0 43px;padding:16px 18px;border-radius:10px;background:var(--accent-soft);border:1px solid #e6bcb0}
+  .note .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--accent);margin-bottom:6px}
+  .note p{font-size:14px;color:#7a2c1c}
+
+  /* tags */
+  .pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:100px;text-transform:uppercase;vertical-align:middle;margin-left:8px}
+  .pill.mvp{background:var(--mvp-soft);color:var(--mvp)}
+  .pill.road{background:var(--road-soft);color:var(--road)}
+
+  /* generic section */
+  .section{margin-top:72px;padding-top:30px;border-top:2px solid var(--ink)}
+  .section>.num{font-family:'Fraunces',serif;font-size:14px;color:var(--accent);font-weight:600}
+  .section>h2{font-family:'Fraunces',serif;font-size:34px;letter-spacing:-.02em;font-weight:600;margin:6px 0 18px;line-height:1.08}
+  .section h3.blk{font-size:18px;font-weight:600;margin:26px 0 4px}
+  .section p.lead{font-size:15.5px;color:var(--ink-soft);max-width:620px;margin-bottom:6px}
+
+  .principle{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:20px 24px;margin-top:14px;box-shadow:var(--shadow)}
+  .principle b{font-weight:600;color:var(--accent)}
+  .principle p{font-size:14.5px;color:var(--ink)}
+
+  /* pricing table */
+  table{width:100%;border-collapse:collapse;margin-top:16px;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+  th{background:var(--paper-2);text-align:left;padding:12px 16px;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
+  td{padding:12px 16px;border-bottom:1px solid var(--rule);color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  td .muted{color:var(--ink-soft);font-size:13px}
+
+  /* priorities */
+  .prio-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+  .prio{border-radius:14px;padding:22px 24px;border:1px solid var(--rule)}
+  .prio.mvp{background:var(--mvp-soft);border-color:#bcd9cb}
+  .prio.road{background:var(--road-soft);border-color:#e3cfa3}
+  .prio h4{font-family:'Fraunces',serif;font-size:18px;margin-bottom:4px}
+  .prio.mvp h4{color:var(--mvp)}
+  .prio.road h4{color:var(--road)}
+  .prio .cap{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:12px;opacity:.7}
+  .prio ul{list-style:none}
+  .prio li{font-size:13.5px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,.1)}
+  .prio li:last-child{border-bottom:none}
+  .prio li b{font-weight:600}
+
+  footer{margin-top:90px;padding-top:24px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-soft)}
+
+  @media(max-width:880px){
+    nav{display:none}
+    main{padding:40px 24px 80px}
+    .prio-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav>
+  <div class="brand">Rayo<span class="dot"></span></div>
+  <div class="tag">Documentación de plataforma</div>
+
+  <h4>Contexto</h4>
+  <a href="#intro">Visión general</a>
+  <a href="#codificacion">Sistema de codificación</a>
+
+  <h4 class="navgroup-1">Portal Cliente</h4>
+  <div class="navgroup-1">
+  <a href="#c-auth">1 · Autenticación</a>
+  <a href="#c-dash">2 · Dashboard</a>
+  <a href="#c-pedidos">3 · Pedidos</a>
+  <a href="#c-inv">4 · Inventario y catálogo</a>
+  <a href="#c-integ">5 · Integraciones</a>
+  <a href="#c-fact">6 · Facturación</a>
+  <a href="#c-config">7 · Configuración</a>
+  </div>
+
+  <h4>Admin Rayo</h4>
+  <a href="#a-auth">1 · Autenticación y roles</a>
+  <a href="#a-dash">2 · Dashboard admin</a>
+  <a href="#a-clientes">3 · Gestión de clientes</a>
+  <a href="#a-recep">4 · Recepción</a>
+  <a href="#a-bodega">5 · Gestión de bodega</a>
+  <a href="#a-orden">6 · Procesamiento</a>
+  <a href="#a-desp">7 · Despacho</a>
+  <a href="#a-oper">8 · Vista operario</a>
+  <a href="#a-fact">9 · Facturación interna</a>
+  <a href="#a-config">10 · Configuración</a>
+
+  <h4>Cierre</h4>
+  <a href="#prioridades">Prioridades MVP / Roadmap</a>
+</nav>
+
+<main>
+
+  <header class="hero" id="intro">
+    <div class="kicker">Fulfillment · Bogotá, Colombia</div>
+    <h1>Plataforma Rayo</h1>
+    <p>Especificación completa de las dos plataformas que componen el sistema operativo de Rayo: el portal que usa la marca cliente y la plataforma interna donde vive el core de la operación de fulfillment.</p>
+    <div class="meta">
+      <span>Construido para escala (multi-cliente)</span>
+      <span>Integración ecommerce automática</span>
+      <span>Operación gobernada por escaneo</span>
+      <span>Desarrollo in-house</span>
+    </div>
+  </header>
+
+  <div class="principle" style="border-left:3px solid var(--accent)">
+    <p><b>Modelo general.</b> Dos plataformas separadas que comparten una sola base de datos. El <b>Portal Cliente</b> es el único punto de contacto de la marca con Rayo. El <b>Admin Rayo</b> es donde tú y tus operarios ejecutan y controlan toda la operación. Cada acción del lado operativo se refleja en tiempo real en el portal del cliente.</p>
+  </div>
+
+  <!-- ================= CODIFICACION ================= -->
+  <section class="section" id="codificacion">
+    <div class="num">Fundamento operativo</div>
+    <h2>Sistema de codificación e inventario</h2>
+    <p class="lead">La base sobre la que se apoya toda la operación. Define cómo se identifica, cuenta y mueve cada unidad física en la bodega.</p>
+
+    <h3 class="blk">Principios</h3>
+    <div class="principle"><p><b>Separación SKU / código de barras.</b> El SKU es la nomenclatura lógica del cliente (texto, ej. <em>CAM-001-ROJA-M</em>) y sirve para mapear contra el ecommerce. El código de barras es la etiqueta física escaneable. Un código de barras siempre apunta a un SKU; no son lo mismo.</p></div>
+    <div class="principle"><p><b>Código maestro Rayo.</b> Cada SKU de cada cliente recibe un código de barras interno único, generado por Rayo y único en toda la bodega sin importar el cliente. Si el producto trae EAN/UPC de fábrica, se registra como referencia adicional, pero el código de operación siempre es el de Rayo. Así nunca hay colisiones entre clientes.</p></div>
+    <div class="principle"><p><b>El escaneo gobierna el workflow.</b> Ningún movimiento de inventario —entrada, picking, packing, despacho— se confirma sin escaneo. El escaneo no es solo conteo: es el mecanismo que previene errores de envío.</p></div>
+
+    <h3 class="blk">Flujo completo</h3>
+    <div class="flow">
+      <div class="step"><span><b>Carga de catálogo.</b> En su portal, el cliente registra cada producto (SKU propio, nombre, descripción, EAN opcional, unidades a enviar) antes del envío físico. Producto por producto o vía Excel/CSV.</span></div>
+      <div class="step"><span><b>Generación de códigos.</b> Al guardar, Rayo crea el código de barras interno único por producto. El cliente descarga un PDF con etiquetas listas para imprimir.</span></div>
+      <div class="step"><span><b>Etiquetado.</b> Opción A: el cliente imprime y pega las etiquetas Rayo antes de enviar. Opción B: el producto llega sin etiqueta y el operario etiqueta en recepción (servicio cobrable por unidad).</span></div>
+      <div class="step"><span><b>Recepción con escaneo.</b> El operario abre la solicitud de ingreso, pistolea cada producto, el sistema cuenta y valida contra lo declarado. Las discrepancias quedan registradas.</span></div>
+      <div class="step"><span><b>Operación gobernada por escaneo.</b> Picking: pistolea para confirmar producto y posición correctos. Packing: vuelve a pistolear para validar antes de empacar. Despacho: escaneo final que cierra la orden.</span></div>
+    </div>
+
+    <div class="note">
+      <div class="lbl">Decisión confirmada — Versión completa</div>
+      <p>Escaneo obligatorio en recepción, picking y packing desde el primer cliente. Implica contar con pistolas (o app de escaneo en celular/tablet) y etiquetado obligatorio desde el día uno. Entra completo en el MVP.</p>
+    </div>
+  </section>
+
+  <!-- ================= PLATAFORMA 1 ================= -->
+  <div class="platform" id="portal-cliente">
+    <div class="num">Plataforma 01</div>
+    <h2>Portal Rayo — Vista del Cliente</h2>
+    <p class="sub">Lo que ve y usa la marca que te contrata. Su único punto de contacto con Rayo.</p>
+  </div>
+
+  <div class="mod" id="c-auth">
+    <div class="mod-head"><div class="mn">1</div><h3>Autenticación</h3></div>
+    <ul>
+      <li>Login con email y contraseña</li>
+      <li>Recuperación de contraseña</li>
+      <li>Primer acceso / onboarding guiado: configura su tienda y carga sus productos</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="c-dash">
+    <div class="mod-head"><div class="mn">2</div><h3>Dashboard principal</h3></div>
+    <p class="desc">Vista resumen del estado de su operación en tiempo real.</p>
+    <ul>
+      <li><strong>Pedidos hoy:</strong> recibidos / en proceso / despachados</li>
+      <li>Pedidos esta semana y este mes</li>
+      <li>Inventario total de unidades activas</li>
+      <li>Alertas de stock bajo (configurable por SKU)</li>
+      <li>Últimas 5 órdenes con estado</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="c-pedidos">
+    <div class="mod-head"><div class="mn">3</div><h3>Pedidos</h3></div>
+    <p class="desc">Vista completa de todas las órdenes del cliente.</p>
+    <ul>
+      <li>Listado con filtros: fecha, estado, canal de origen (Shopify / WooCommerce / Tienda Nube)</li>
+      <li>Estado de cada pedido: Recibido → En preparación → Despachado → Entregado</li>
+      <li>Detalle: ítems, cantidades, dirección de entrega, número de guía, transportadora</li>
+      <li>Historial completo descargable</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="c-inv">
+    <div class="mod-head"><div class="mn">4</div><h3>Inventario y catálogo</h3></div>
+    <p class="desc">Control del stock almacenado en bodega Rayo y registro del catálogo de productos.</p>
+    <ul>
+      <li>Listado de SKUs activos con foto, nombre, referencia, unidades disponibles, posición en bodega</li>
+      <li>Historial de movimientos por SKU (entradas y salidas)</li>
+      <li>Alertas de stock mínimo configurables por SKU</li>
+      <li>Solicitud de ingreso de mercancía (el cliente notifica cuándo enviará producto)</li>
+    </ul>
+    <div class="sub-block">
+      <h5>Submódulo · Catálogo de productos</h5>
+      <ul>
+        <li>Vista tipo tabla para registrar productos: SKU, nombre, descripción, EAN de fábrica (opcional), unidades a enviar</li>
+        <li>Carga masiva por Excel/CSV</li>
+        <li>Generación automática del código de barras interno Rayo</li>
+        <li>Descarga de PDF con etiquetas listas para imprimir</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mod" id="c-integ">
+    <div class="mod-head"><div class="mn">5</div><h3>Integraciones</h3></div>
+    <p class="desc">Conexión del ecommerce del cliente con Rayo.</p>
+    <ul>
+      <li>Conectar tienda: Shopify / WooCommerce / Tienda Nube</li>
+      <li>Estado de la integración: activa / con error / desconectada</li>
+      <li>Mapeo de SKUs del ecommerce vs SKUs en bodega Rayo</li>
+      <li>Log de sincronización: últimos pedidos recibidos, errores de importación</li>
+    </ul>
+    <div class="note">
+      <div class="lbl">Nota arquitectural — el módulo más complejo</div>
+      <p>Cada plataforma tiene su propio sistema de webhooks y autenticación. Los problemas comunes: pedidos duplicados, SKUs que no coinciden, cancelaciones que llegan tarde, actualizaciones de inventario que fallan en silencio. Requiere manejo de idempotencia y sistema de reintentos. Va en el MVP pero hay que construirlo con cuidado.</p>
+    </div>
+  </div>
+
+  <div class="mod" id="c-fact">
+    <div class="mod-head"><div class="mn">6</div><h3>Facturación <span class="pill road">Roadmap</span></h3></div>
+    <p class="desc">Lo que el cliente debe pagar cada mes.</p>
+    <ul>
+      <li>Resumen del mes en curso: fee mensual de plataforma, órdenes procesadas (cantidad × tarifa), posiciones de almacenamiento × días</li>
+      <li>Historial de facturas anteriores descargables</li>
+      <li>Estado de pago: pendiente / pagado / vencido</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="c-config">
+    <div class="mod-head"><div class="mn">7</div><h3>Configuración de cuenta <span class="pill road">Roadmap</span></h3></div>
+    <ul>
+      <li>Datos de la empresa (NIT, razón social, dirección)</li>
+      <li>Contactos (quién recibe alertas, quién aprueba ingresos)</li>
+      <li>Preferencias de empaque (instrucciones de branding, materiales)</li>
+      <li>Cambio de contraseña</li>
+    </ul>
+  </div>
+
+  <!-- ================= PLATAFORMA 2 ================= -->
+  <div class="platform" id="admin-rayo">
+    <div class="num">Plataforma 02</div>
+    <h2>Admin Rayo — Vista Operativa Interna</h2>
+    <p class="sub">Lo que usan tú y tus operarios. Aquí vive el core del negocio.</p>
+  </div>
+
+  <div class="mod" id="a-auth">
+    <div class="mod-head"><div class="mn">1</div><h3>Autenticación y roles</h3></div>
+    <ul>
+      <li><strong>Administrador (tú):</strong> acceso total</li>
+      <li><strong>Operario:</strong> acceso solo a tareas asignadas (picking, packing, recepción)</li>
+      <li>Gestión de usuarios: agregar / desactivar operarios fácilmente</li>
+      <li>Registro de actividad por usuario</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="a-dash">
+    <div class="mod-head"><div class="mn">2</div><h3>Dashboard administrador</h3></div>
+    <p class="desc">Vista del estado global de la operación Rayo.</p>
+    <ul>
+      <li>Total de pedidos hoy por estado: pendientes / en proceso / despachados</li>
+      <li>Pedidos por cliente (comparativo)</li>
+      <li>Inventario total en bodega por cliente</li>
+      <li>Operarios activos y qué tarea hace cada uno</li>
+      <li>Alertas: pedidos sin procesar hace más de X horas, errores de integración, stock crítico</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="a-clientes">
+    <div class="mod-head"><div class="mn">3</div><h3>Gestión de clientes</h3></div>
+    <p class="desc">Administración de las marcas que operan con Rayo.</p>
+    <ul>
+      <li>Listado de clientes activos</li>
+      <li>Ficha por cliente: datos, integraciones conectadas, SKUs activos, volumen de órdenes, estado de cuenta</li>
+      <li>Onboarding de nuevo cliente: configuración inicial paso a paso</li>
+      <li>Activar / pausar / desactivar cliente</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="a-recep">
+    <div class="mod-head"><div class="mn">4</div><h3>Recepción de mercancía</h3></div>
+    <p class="desc">Cuando un cliente envía producto a la bodega.</p>
+    <div class="flow">
+      <div class="step"><span>Cliente crea solicitud de ingreso desde su portal</span></div>
+      <div class="step"><span>Admin la aprueba y asigna al operario</span></div>
+      <div class="step"><span>Operario recibe físicamente y <b>pistolea cada producto</b>, validando contra el catálogo declarado</span></div>
+      <div class="step"><span>Sistema actualiza inventario automáticamente y registra discrepancias (declaró 100, llegaron 97)</span></div>
+      <div class="step"><span>Cliente ve el ingreso reflejado en su portal en tiempo real</span></div>
+    </div>
+    <div class="sub-block">
+      <h5>Contenido del módulo</h5>
+      <ul>
+        <li>Ingresos pendientes de recibir</li>
+        <li>Ingreso en proceso (con operario asignado)</li>
+        <li>Historial de recepciones por cliente</li>
+        <li>Registro de discrepancias (lo que llegó vs lo que debía llegar)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mod" id="a-bodega">
+    <div class="mod-head"><div class="mn">5</div><h3>Gestión de bodega <span class="pill road">Roadmap (versión avanzada)</span></h3></div>
+    <p class="desc">Control del espacio físico y el inventario almacenado.</p>
+    <ul>
+      <li>Mapa de posiciones de bodega (estanterías, bins)</li>
+      <li>Qué hay en cada posición: SKU, cliente, cantidad</li>
+      <li>Movimientos internos (reubicar producto)</li>
+      <li>Inventario total consolidado y por cliente</li>
+      <li>Conteo físico / auditoría de inventario</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="a-orden">
+    <div class="mod-head"><div class="mn">6</div><h3>Procesamiento de órdenes</h3></div>
+    <p class="desc">El corazón operativo. Donde se procesa cada pedido.</p>
+    <div class="flow">
+      <div class="step"><span>Pedido llega automáticamente desde la integración ecommerce</span></div>
+      <div class="step"><span>Sistema verifica stock disponible</span></div>
+      <div class="step"><span>Orden entra a cola de trabajo</span></div>
+      <div class="step"><span>Operario asignado recibe la tarea en su vista</span></div>
+      <div class="step"><span><b>Picking:</b> va a la posición indicada, recoge el producto y <b>pistolea para confirmar</b></span></div>
+      <div class="step"><span><b>Packing:</b> empaca con instrucciones del cliente y <b>pistolea para validar</b> antes de cerrar</span></div>
+      <div class="step"><span>Generación de guía con la transportadora</span></div>
+      <div class="step"><span>Despacho confirmado → estado actualizado → cliente notificado</span></div>
+    </div>
+    <div class="sub-block">
+      <h5>Contenido del módulo</h5>
+      <ul>
+        <li>Cola de órdenes pendientes (por prioridad / hora de llegada)</li>
+        <li>Órdenes en proceso con operario asignado</li>
+        <li>Órdenes listas para despacho</li>
+        <li>Órdenes despachadas del día</li>
+        <li>Detalle de orden: ítems, posiciones de picking, instrucciones de empaque, guía generada</li>
+        <li>Gestión de errores: stock insuficiente, dirección inválida, pedido cancelado</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mod" id="a-desp">
+    <div class="mod-head"><div class="mn">7</div><h3>Despacho</h3></div>
+    <p class="desc">Coordinación con transportadoras.</p>
+    <ul>
+      <li>Órdenes listas para despacho agrupadas por transportadora</li>
+      <li>Generación de guías (integración con Coordinadora, Interrapidísimo, Deprisa)</li>
+      <li>Manifiesto de entrega (listado de paquetes que recoge la transportadora)</li>
+      <li>Confirmación de recogida</li>
+      <li>Rastreo de guías activas</li>
+      <li><strong>Escaneo final de cierre de orden</strong></li>
+    </ul>
+  </div>
+
+  <div class="mod" id="a-oper">
+    <div class="mod-head"><div class="mn">8</div><h3>Vista del operario</h3></div>
+    <p class="desc">Vista simplificada, pensada para usar desde celular o tablet en bodega.</p>
+    <ul>
+      <li>Mis tareas asignadas hoy</li>
+      <li>Tarea activa: instrucción paso a paso (qué recoger, en qué posición, cómo empacar)</li>
+      <li>Confirmar tarea completada (mediante escaneo)</li>
+      <li>Reportar problema (falta de stock, producto dañado, discrepancia)</li>
+    </ul>
+  </div>
+
+  <div class="mod" id="a-fact">
+    <div class="mod-head"><div class="mn">9</div><h3>Facturación interna <span class="pill road">Roadmap</span></h3></div>
+    <p class="desc">Lo que Rayo le cobra a cada cliente. Contraparte del módulo de facturación del portal.</p>
+    <ul>
+      <li>Liquidación automática mensual por cliente: fee mensual + órdenes procesadas (conteo × tarifa) + días × posiciones ocupadas</li>
+      <li>Generación de pre-factura para revisión</li>
+      <li>Confirmación y envío al cliente</li>
+      <li>Estado de cobro por cliente: pendiente / pagado / vencido</li>
+      <li>Configuración de tarifas por cliente (cada uno puede tener condiciones distintas)</li>
+    </ul>
+
+    <div class="sub-block">
+      <h5>Modelo de cobro base (referencia: Melonn)</h5>
+      <table>
+        <tr><th>Componente</th><th>Descripción</th><th>Referencia Melonn</th></tr>
+        <tr><td><b>Fee mensual</b></td><td>Plataforma + gestión, por cliente</td><td>$210,900 / mes</td></tr>
+        <tr><td><b>Por orden procesada</b></td><td>Picking + packing, plano o escalonado por ítems</td><td>$3,037 1ª unidad · $902 adicional <span class="muted">(D2C)</span></td></tr>
+        <tr><td><b>Almacenamiento</b></td><td>Por posición de estantería ocupada al mes</td><td>$25,500 / posición <span class="muted">(1×0.5×0.5m)</span></td></tr>
+        <tr><td><b>Transporte</b></td><td>Lo pasa el cliente directo, o lo gestiona Rayo con margen</td><td class="muted">A definir operativamente</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="mod" id="a-config">
+    <div class="mod-head"><div class="mn">10</div><h3>Configuración del sistema</h3></div>
+    <ul>
+      <li>Gestión de usuarios y roles</li>
+      <li>Configuración de bodega (agregar posiciones, estanterías)</li>
+      <li>Integraciones con transportadoras</li>
+      <li>Parámetros generales (hora de corte de despacho, alertas automáticas)</li>
+      <li>Servicio de etiquetado en bodega como opción cobrable por cliente</li>
+    </ul>
+  </div>
+
+  <!-- ================= PRIORIDADES ================= -->
+  <section class="section" id="prioridades">
+    <div class="num">Cierre</div>
+    <h2>Prioridades — MVP vs Roadmap</h2>
+    <p class="lead">El documento describe el sistema completo. Esta es la línea entre lo que necesitas para operar con el primer cliente y lo que construyes después de validar. Es la herramienta para que las 12 horas/semana no se diluyan.</p>
+
+    <div class="prio-grid">
+      <div class="prio mvp">
+        <h4>MVP</h4>
+        <div class="cap">Para operar con el primer cliente</div>
+        <ul>
+          <li><b>Portal:</b> Autenticación</li>
+          <li><b>Portal:</b> Dashboard</li>
+          <li><b>Portal:</b> Pedidos</li>
+          <li><b>Portal:</b> Inventario + Catálogo</li>
+          <li><b>Portal:</b> Integraciones (al menos Shopify)</li>
+          <li><b>Admin:</b> Autenticación + Roles</li>
+          <li><b>Admin:</b> Dashboard</li>
+          <li><b>Admin:</b> Recepción de mercancía</li>
+          <li><b>Admin:</b> Procesamiento de órdenes</li>
+          <li><b>Admin:</b> Despacho</li>
+          <li><b>Admin:</b> Vista operario</li>
+          <li><b>Transversal:</b> Codificación + escaneo completo</li>
+        </ul>
+      </div>
+      <div class="prio road">
+        <h4>Roadmap</h4>
+        <div class="cap">Después de validar con clientes reales</div>
+        <ul>
+          <li><b>Portal:</b> Facturación</li>
+          <li><b>Portal:</b> Configuración avanzada</li>
+          <li><b>Admin:</b> Facturación interna</li>
+          <li><b>Admin:</b> Gestión de bodega avanzada</li>
+          <li><b>Admin:</b> Múltiples integraciones de transportadoras</li>
+          <li><b>Admin:</b> Analytics y reportería</li>
+          <li><b>Portal:</b> WooCommerce + Tienda Nube</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Plataforma Rayo · Documento de estructura · Versión 1 · Bogotá, Colombia<br>
+    Construido para escala multi-cliente · Operación gobernada por escaneo · Desarrollo in-house
+  </footer>
+
+</main>
+</div>
+</body>
+</html>

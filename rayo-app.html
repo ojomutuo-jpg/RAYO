@@ -210,41 +210,42 @@
 /* ============================================================
    ESTADO COMPARTIDO  (un solo "sistema" para ambas vistas)
 ============================================================ */
-const DB = {
-  client: { name:'Strap Colombia', nit:'901.234.567-1' },
-  catalog: [
-    { id:'P1', sku:'STR-CIN-NEG-M', name:'Cinturón cuero negro M', desc:'Cuero genuino, hebilla acero', ean:'7701234500011', rayo:'RY-0001', units:120, pos:'A-01' },
-    { id:'P2', sku:'STR-CIN-CAF-L', name:'Cinturón cuero café L', desc:'Cuero genuino, hebilla bronce', ean:'7701234500028', rayo:'RY-0002', units:84, pos:'A-02' },
-    { id:'P3', sku:'STR-BIL-NEG',   name:'Billetera negra', desc:'Cuero, 6 tarjetas', ean:'', rayo:'RY-0003', units:43, pos:'B-05' },
-  ],
-  integrations:[
-    { name:'Shopify', status:'active' },
-    { name:'WooCommerce', status:'off' },
-    { name:'Tienda Nube', status:'off' },
-  ],
-  // pedidos: estados -> received | queue | picking | packed | dispatched
-  orders:[
-    { id:'#1042', channel:'Shopify', cust:'María Gómez', city:'Bogotá', date:'07 Jun', status:'queue',
-      items:[{pid:'P1',qty:1},{pid:'P3',qty:1}], carrier:null, guide:null, operator:null },
-    { id:'#1041', channel:'Shopify', cust:'Andrés Ruiz', city:'Medellín', date:'07 Jun', status:'queue',
-      items:[{pid:'P2',qty:2}], carrier:null, guide:null, operator:null },
-    { id:'#1039', channel:'WooCommerce', cust:'Laura Peña', city:'Cali', date:'06 Jun', status:'dispatched',
-      items:[{pid:'P1',qty:1}], carrier:'Coordinadora', guide:'CO-88451', operator:'Carlos' },
-    { id:'#1038', channel:'Shopify', cust:'Juan Torres', city:'Bogotá', date:'06 Jun', status:'dispatched',
-      items:[{pid:'P3',qty:2}], carrier:'Interrapidísimo', guide:'IR-22107', operator:'Diana' },
-  ],
-  receipts:[
-    { id:'R-204', date:'05 Jun', declared:[{pid:'P1',qty:50}], status:'done', operator:'Carlos', discrepancy:0 },
-  ],
-  operators:[
-    { name:'Carlos', role:'Operario', active:true, task:'Picking #1042' },
-    { name:'Diana', role:'Operario', active:true, task:'Disponible' },
-  ],
-};
-const RATES = { monthly:210900, perOrder1:3037, perOrderAdd:902, storage:25500 };
+let DB = {};
+let RATES = {};
 
 let SESSION = { role:null };
 let pickedRole = null;
+const ROLE_DEFAULT_EMAIL = { admin:'ops@rayo.co', client:'hola@strap.co' };
+const LOGIN_STATE = { email:ROLE_DEFAULT_EMAIL.client, pass:'demo' };
+let appDataLoaded = false;
+
+function syncLoginFields(){
+  $('#email').value = LOGIN_STATE.email;
+  $('#pass').value = LOGIN_STATE.pass;
+}
+
+async function loadData(){
+  const res = await fetch('/api/data');
+  if (!res.ok) throw new Error('No se pudo cargar la data');
+  const data = await res.json();
+  DB = data;
+  RATES = data.rates || {};
+  appDataLoaded = true;
+}
+
+function ensureData(){
+  return appDataLoaded ? Promise.resolve() : loadData();
+}
+
+async function apiPost(path, body){
+  const res = await fetch(path, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  return res.json();
+}
+
+async function apiPut(path, body){
+  const res = await fetch(path, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  return res.json();
+}
 
 /* ============================================================
    HELPERS
@@ -268,10 +269,19 @@ function pickRole(r){
   pickedRole=r;
   $('#pickAdmin').classList.toggle('sel',r==='admin');
   $('#pickClient').classList.toggle('sel',r==='client');
-  $('#email').value = r==='admin' ? 'ops@rayo.co' : 'hola@strap.co';
+  if(!LOGIN_STATE.email || LOGIN_STATE.email===ROLE_DEFAULT_EMAIL.admin || LOGIN_STATE.email===ROLE_DEFAULT_EMAIL.client){
+    LOGIN_STATE.email = ROLE_DEFAULT_EMAIL[r];
+  }
+  syncLoginFields();
 }
-function doLogin(){
+async function doLogin(){
   if(!pickedRole){toast('Elige un tipo de acceso');return;}
+  try {
+    await ensureData();
+  } catch (err) {
+    toast('Error cargando datos del servidor');
+    return;
+  }
   SESSION.role=pickedRole;
   $('#login').classList.add('hidden');
   $('#app').classList.remove('hidden');
@@ -283,6 +293,10 @@ function logout(){
   $('#login').classList.remove('hidden');
   $('#pickAdmin').classList.remove('sel');$('#pickClient').classList.remove('sel');
 }
+
+$('#email').addEventListener('input', e => LOGIN_STATE.email = e.target.value);
+$('#pass').addEventListener('input', e => LOGIN_STATE.pass = e.target.value);
+syncLoginFields();
 
 /* ============================================================
    SHELL + MENU
@@ -616,8 +630,22 @@ function goto(key){
 /* ============================================================
    ACCIONES INTERACTIVAS
 ============================================================ */
-function toggleInteg(i){DB.integrations[i].status=DB.integrations[i].status==='active'?'off':'active';render('integrations');toast(`${DB.integrations[i].name} ${DB.integrations[i].status==='active'?'conectada':'desconectada'}`);}
-function toggleOp(i){DB.operators[i].active=!DB.operators[i].active;DB.operators[i].task=DB.operators[i].active?'Disponible':'—';$('#opBody').innerHTML=opRows();toast(`${DB.operators[i].name} ${DB.operators[i].active?'activado':'desactivado'}`);}
+async function toggleInteg(i){
+  const integration = DB.integrations[i];
+  const status = integration.status === 'active' ? 'off' : 'active';
+  const updated = await apiPut(`/api/integrations/${encodeURIComponent(integration.name)}`, { status });
+  DB.integrations[i] = updated;
+  render('integrations');
+  toast(`${updated.name} ${updated.status==='active'?'conectada':'desconectada'}`);
+}
+async function toggleOp(i){
+  const op = DB.operators[i];
+  const active = !op.active;
+  const updated = await apiPut(`/api/operators/${i}`, { active, task: active ? 'Disponible' : '—' });
+  DB.operators[i] = updated;
+  $('#opBody').innerHTML = opRows();
+  toast(`${updated.name} ${updated.active ? 'activado' : 'desactivado'}`);
+}
 
 /* ----- Cliente: agregar producto ----- */
 function modalAddProduct(){
@@ -636,12 +664,15 @@ function modalAddProduct(){
     <div class="modal-foot"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn pri" onclick="saveProduct()">Guardar y generar código</button></div>
   </div></div>`;
 }
-function saveProduct(){
+async function saveProduct(){
   const sku=$('#np_sku').value.trim()||'SKU-'+Math.floor(Math.random()*900+100);
-  const n=DB.catalog.length+1;
-  const rayo='RY-'+String(n).padStart(4,'0');
-  DB.catalog.push({id:'P'+Date.now(),sku,name:$('#np_name').value.trim()||'Producto sin nombre',desc:$('#np_desc').value.trim(),ean:$('#np_ean').value.trim(),rayo,units:+$('#np_units').value||0,pos:'—'});
-  closeModal();render('catalog');toast(`Producto creado · código ${rayo} generado`);
+  const name=$('#np_name').value.trim()||'Producto sin nombre';
+  const desc=$('#np_desc').value.trim();
+  const ean=$('#np_ean').value.trim();
+  const units=+$('#np_units').value||0;
+  const product = await apiPost('/api/catalog', { sku, name, desc, ean, units });
+  DB.catalog.push(product);
+  closeModal();render('catalog');toast(`Producto creado · código ${product.rayo} generado`);
 }
 
 /* ----- Cliente: solicitar ingreso ----- */
@@ -656,11 +687,11 @@ function modalRequestIngress(){
     <div class="modal-foot"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn pri" onclick="saveIngress()">Crear solicitud</button></div>
   </div></div>`;
 }
-function saveIngress(){
+async function saveIngress(){
   const pid=$('#ri_prod').value,qty=+$('#ri_qty').value||0;
-  const id='R-'+Math.floor(Math.random()*900+205);
-  DB.receipts.push({id,date:'07 Jun',declared:[{pid,qty}],status:'pending',operator:null,discrepancy:0});
-  closeModal();toast(`Ingreso ${id} solicitado · visible para Admin Rayo`);
+  const receipt = await apiPost('/api/receipts', { pid, qty });
+  DB.receipts.push(receipt);
+  closeModal();toast(`Ingreso ${receipt.id} solicitado · visible para Admin Rayo`);
 }
 
 /* ----- Admin: recibir con escaneo ----- */
@@ -682,12 +713,12 @@ function modalReceive(rid){
     </div></div></div>`;};
   window._scan=()=>{if(scanned<total){scanned++;draw();}};
   window._scanAll=()=>{scanned=total;draw();};
-  window._finishRecv=()=>{
-    const pid=r.declared[0].pid;prod(pid).units+=scanned;
-    r.status='done';r.operator='Carlos';r.discrepancy=total-scanned;r.date='07 Jun';
-    if(prod(pid).pos==='—')prod(pid).pos='C-0'+(DB.catalog.length);
+  window._finishRecv=async ()=>{
+    const payload = { status:'done', scanned, operator:'Carlos', discrepancy: total-scanned };
+    await apiPut(`/api/receipts/${encodeURIComponent(rid)}`, payload);
+    await loadData();
     closeModal();render('receiving');
-    toast(r.discrepancy===0?`Ingreso ${rid} completo · inventario actualizado`:`Ingreso ${rid} con discrepancia de ${r.discrepancy} und`);
+    toast(payload.discrepancy===0?`Ingreso ${rid} completo · inventario actualizado`:`Ingreso ${rid} con discrepancia de ${payload.discrepancy} und`);
   };
   draw();
 }
@@ -695,7 +726,7 @@ function modalReceive(rid){
 /* ----- Admin: procesar orden (picking + packing con escaneo) ----- */
 function modalProcess(oid){
   const o=DB.orders.find(x=>x.id===oid);
-  if(o.status==='queue'){o.status='picking';o.operator='Carlos';DB.operators[0].task='Picking '+oid;}
+  if(o.status==='queue'){o.status='picking';o.operator='Carlos';DB.operators[0].task='Picking '+oid;apiPut(`/api/orders/${encodeURIComponent(oid)}`, { status:'picking', operator:'Carlos' });}
   let picked=o.items.map(()=>false);
   const draw=()=>{
     const allDone=picked.every(Boolean);
@@ -715,9 +746,10 @@ function modalProcess(oid){
       </div></div></div>`;
   };
   window._pick=i=>{picked[i]=true;draw();};
-  window._pack=()=>{
-    o.status='packed';
-    o.items.forEach(it=>{prod(it.pid).units=Math.max(0,prod(it.pid).units-it.qty);});
+  window._pack=async ()=>{
+    const unitsRemoved = o.items.reduce((sum,it)=>sum+it.qty,0);
+    await apiPut(`/api/orders/${encodeURIComponent(oid)}`, { status:'packed', operator:'Carlos', items:o.items, stockChange:-unitsRemoved });
+    await loadData();
     DB.operators[0].task='Disponible';
     closeModal();render('orders');
     toast(`${oid} empacado · listo para despacho`);
@@ -738,14 +770,14 @@ function modalDispatch(oid){
     </div>
     <div class="modal-foot"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn pri" onclick="window._genGuide('${oid}')">Generar y despachar</button></div>
   </div></div>`;
-  window._genGuide=(id)=>{
-    const ord=DB.orders.find(x=>x.id===id);
-    ord.carrier=$('#dp_carrier').value;
-    const pfx={'Coordinadora':'CO','Interrapidísimo':'IR','Deprisa':'DP'}[ord.carrier];
-    ord.guide=pfx+'-'+Math.floor(Math.random()*90000+10000);
-    ord.status='dispatched';ord.operator=ord.operator||'Carlos';
+  window._genGuide=async (id)=>{
+    const carrier=$('#dp_carrier').value;
+    const pfx={'Coordinadora':'CO','Interrapidísimo':'IR','Deprisa':'DP'}[carrier];
+    const guide=pfx+'-'+Math.floor(Math.random()*90000+10000);
+    await apiPut(`/api/orders/${encodeURIComponent(id)}`, { status:'dispatched', carrier, guide, operator:'Carlos' });
+    await loadData();
     closeModal();render('dispatch');
-    toast(`Guía ${ord.guide} generada · ${id} despachado`);
+    toast(`Guía ${guide} generada · ${id} despachado`);
   };
 }
 
@@ -766,5 +798,13 @@ function saveOperator(){
   closeModal();render('operators');toast(`${name} agregado al equipo`);
 }
 </script>
+// Supabase client example (browser ESM) - replace placeholders before enabling
+// <script type="module">
+//   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+//   const supabaseUrl = '<YOUR_SUPABASE_URL>'
+//   const supabaseKey = '<YOUR_SUPABASE_ANON_KEY>'
+//   const supabase = createClient(supabaseUrl, supabaseKey)
+//   window.supabase = supabase
+// </script>
 </body>
 </html>

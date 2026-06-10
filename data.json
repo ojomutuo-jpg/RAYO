@@ -1,0 +1,27 @@
+{
+  "client": { "name": "Strap Colombia", "nit": "901.234.567-1" },
+  "catalog": [
+    { "id": "P1", "sku": "STR-CIN-NEG-M", "name": "Cinturón cuero negro M", "desc": "Cuero genuino, hebilla acero", "ean": "7701234500011", "rayo": "RY-0001", "units": 120, "pos": "A-01" },
+    { "id": "P2", "sku": "STR-CIN-CAF-L", "name": "Cinturón cuero café L", "desc": "Cuero genuino, hebilla bronce", "ean": "7701234500028", "rayo": "RY-0002", "units": 84, "pos": "A-02" },
+    { "id": "P3", "sku": "STR-BIL-NEG", "name": "Billetera negra", "desc": "Cuero, 6 tarjetas", "ean": "", "rayo": "RY-0003", "units": 43, "pos": "B-05" }
+  ],
+  "integrations": [
+    { "name": "Shopify", "status": "active" },
+    { "name": "WooCommerce", "status": "off" },
+    { "name": "Tienda Nube", "status": "off" }
+  ],
+  "orders": [
+    { "id": "#1042", "channel": "Shopify", "cust": "María Gómez", "city": "Bogotá", "date": "07 Jun", "status": "queue", "items": [ { "pid": "P1", "qty": 1 }, { "pid": "P3", "qty": 1 } ], "carrier": null, "guide": null, "operator": null },
+    { "id": "#1041", "channel": "Shopify", "cust": "Andrés Ruiz", "city": "Medellín", "date": "07 Jun", "status": "queue", "items": [ { "pid": "P2", "qty": 2 } ], "carrier": null, "guide": null, "operator": null },
+    { "id": "#1039", "channel": "WooCommerce", "cust": "Laura Peña", "city": "Cali", "date": "06 Jun", "status": "dispatched", "items": [ { "pid": "P1", "qty": 1 } ], "carrier": "Coordinadora", "guide": "CO-88451", "operator": "Carlos" },
+    { "id": "#1038", "channel": "Shopify", "cust": "Juan Torres", "city": "Bogotá", "date": "06 Jun", "status": "dispatched", "items": [ { "pid": "P3", "qty": 2 } ], "carrier": "Interrapidísimo", "guide": "IR-22107", "operator": "Diana" }
+  ],
+  "receipts": [
+    { "id": "R-204", "date": "05 Jun", "declared": [ { "pid": "P1", "qty": 50 } ], "status": "done", "operator": "Carlos", "discrepancy": 0 }
+  ],
+  "operators": [
+    { "name": "Carlos", "role": "Operario", "active": true, "task": "Picking #1042" },
+    { "name": "Diana", "role": "Operario", "active": true, "task": "Disponible" }
+  ],
+  "rates": { "monthly": 210900, "perOrder1": 3037, "perOrderAdd": 902, "storage": 25500 }
+}
